@@ -19,7 +19,6 @@ def is_probable_prime(n, k=8):
     for p in small_primes:
         if n % p == 0:
             return n == p
-    # write n-1 as d*2^s
     d = n - 1
     s = 0
     while d % 2 == 0:
@@ -188,3 +187,5 @@ def demo():
     print("ElGamal: p_bits {}, q_bits {}".format(p.bit_length(), q.bit_length()))
     print("RSA: n_bits {}".format(n.bit_length()))
     print("Note: pour usage réel, augmentez les tailles et utilisez libs optimisées.")
+
+demo()
