@@ -69,7 +69,7 @@ def elgamal_test(key_size):
 
 ## Génération des clés ??
 
-key_sizes = [1024, 2048, 3072, 4096, 5120, 6144]
+key_sizes = [1024, 2048, 3072, 4096, 5120]
 
 rsa_enc_times = []
 rsa_dec_times = []
