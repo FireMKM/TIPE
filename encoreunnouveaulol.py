@@ -88,20 +88,18 @@ def decrypt(cipher, private_key):
 
 def rsa_test(key_size):
     # Génération des clés
-    key = generate_keys(key_size)
-    cipher = PKCS1_OAEP.new(key)
-    decipher = PKCS1_OAEP.new(key)
+    public_key, private_key = generate_keys(key_size)
 
     message = b"Hello Crypto"
 
     # Chiffrement
     start = time.perf_counter()
-    ciphertext = cipher.encrypt(message)
+    ciphertext = encrypt(message, public_key)
     enc_time = time.perf_counter() - start
 
     # Déchiffrement
     start = time.perf_counter()
-    plaintext = decipher.decrypt(ciphertext)
+    plaintext = decrypt(ciphertext, private_key)
     dec_time = time.perf_counter() - start
 
     return enc_time, dec_time
