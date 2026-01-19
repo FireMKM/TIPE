@@ -1,5 +1,6 @@
 import time
 import random
+import math
 import matplotlib.pyplot as plt
 
 from Crypto.PublicKey import RSA
@@ -63,7 +64,7 @@ def generate_keys(bits=1024):
     phi = (p - 1) * (q - 1)
 
     e = 65537
-    if gcd(e, phi) != 1:
+    if math.gcd(e, phi) != 1:
         e = random.randrange(2, phi)
         while gcd(e, phi) != 1:
             e = random.randrange(2, phi)
@@ -74,7 +75,7 @@ def generate_keys(bits=1024):
 
 def encrypt(message, public_key):
     e, n = public_key
-    message_int = int.from_bytes(message.encode(), 'big')
+    message_int = int.from_bytes(message, 'big')
     if message_int >= n:
         raise ValueError("Message trop long")
     cipher = pow(message_int, e, n)
