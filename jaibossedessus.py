@@ -1,29 +1,45 @@
 import time
 import random
 import matplotlib.pyplot as plt
+import math
+import secrets
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Util.number import getPrime, inverse, bytes_to_long, long_to_bytes
 
-## RSA
+## Mon RSA
 
-def rsa_test(key_size):
-    # Génération des clés
-    key = RSA.generate(key_size)
-    cipher = PKCS1_OAEP.new(key)
-    decipher = PKCS1_OAEP.new(key)
+def my_rsa_generate_keys(key_size):
+    p, q = getPrime(int(key_size/2)), getPrime(int(key_size/2))
+    n = p * q
+    phi_n = (p-1) * (q-1)
+    e = 65537
+    d = pow(e, -1, phi_n)
+    return (n, e), (n, d)
 
-    message = b"Hello Crypto"
 
-    # Chiffrement
+def my_rsa_encrypt(message, public_key):
+    cipher = pow(message, public_key[1], public_key[0])
+    return cipher
+
+
+def my_rsa_decrypt(cipher, private_key):
+    decipher = pow(cipher, private_key[1], private_key[0])
+    return decipher
+
+
+def my_rsa_test(secret_message, public_key, private_key):
+    message = bytes_to_long(secret_message)
+
+    # Encryption
     start = time.perf_counter()
-    ciphertext = cipher.encrypt(message)
+    cipher = my_rsa_encrypt(message, public_key)
     enc_time = time.perf_counter() - start
 
-    # Déchiffrement
+    # Decryption
     start = time.perf_counter()
-    plaintext = decipher.decrypt(ciphertext)
+    decipher = my_rsa_decrypt(cipher, private_key)
     dec_time = time.perf_counter() - start
 
     return enc_time, dec_time
@@ -51,23 +67,23 @@ def elgamal_decrypt(p, x, c1, c2):
     return (c2 * s_inv) % p
 
 
-def elgamal_test(key_size):
-    p, g, x, y = elgamal_generate_keys(key_size)
-    message = bytes_to_long(b"Hello Crypto")
+def elgamal_test(secret_message, L):
+    p, g, x, y = L
+    message = bytes_to_long(secret_message)
 
-    # Chiffrement
+    # Encryption
     start = time.perf_counter()
     c1, c2 = elgamal_encrypt(p, g, y, message)
     enc_time = time.perf_counter() - start
 
-    # Déchiffrement
+    # Decryption
     start = time.perf_counter()
     decrypted = elgamal_decrypt(p, x, c1, c2)
     dec_time = time.perf_counter() - start
 
     return enc_time, dec_time
 
-## Génération des clés ??
+## Benchmark
 
 key_sizes = [1024, 2048, 3072, 4096]
 
@@ -78,16 +94,21 @@ elg_dec_times = []
 
 bstart=time.perf_counter()
 
+secret_message = secrets.randbits(256)
+
 for size in key_sizes:
     print(f"Testing key size: {size} bits")
 
-    r_enc, r_dec = rsa_test(size)
-    e_enc, e_dec = elgamal_test(size)
+    elgamal_param = elgamal_generate_keys(size)
+    rsa_param = my_rsa_generate_keys(size)
 
-    rsa_enc_times.append(round(r_enc, 4))
-    rsa_dec_times.append(round(r_dec, 4))
-    elg_enc_times.append(round(e_enc, 4))
-    elg_dec_times.append(round(e_dec, 4))
+    r_enc, r_dec = my_rsa_test(secret_message, rsa_param[0], rsa_param[1])
+    e_enc, e_dec = elgamal_test(secret_message, elgamal_param)
+
+    rsa_enc_times.append(round(r_enc, 8))
+    rsa_dec_times.append(round(r_dec, 8))
+    elg_enc_times.append(round(e_enc, 8))
+    elg_dec_times.append(round(e_dec, 8))
 
 print(rsa_enc_times)
 print(rsa_dec_times)
@@ -98,9 +119,9 @@ btime=round(time.perf_counter()-bstart)
 
 print(f"The algorithm took {btime//60}min{btime%60}s to run")
 
-## Graphes
+## Graphs
 
-# Graphe chiffrement
+# Encryption graph
 plt.figure()
 plt.plot(key_sizes, rsa_enc_times, marker='o', label='RSA Encryption')
 plt.plot(key_sizes, elg_enc_times, marker='o', label='ElGamal Encryption')
@@ -111,7 +132,7 @@ plt.legend()
 plt.grid()
 plt.show()
 
-# Graphe déchiffrement
+# Decryption graph
 plt.figure()
 plt.plot(key_sizes, rsa_dec_times, marker='o', label='RSA Decryption')
 plt.plot(key_sizes, elg_dec_times, marker='o', label='ElGamal Decryption')
