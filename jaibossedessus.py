@@ -1,11 +1,8 @@
 import time
 import random
 import matplotlib.pyplot as plt
-import math
 import secrets
 
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Util.number import getPrime, inverse, bytes_to_long, long_to_bytes
 
 ## Mon RSA
@@ -91,16 +88,23 @@ rsa_enc_times = []
 rsa_dec_times = []
 elg_enc_times = []
 elg_dec_times = []
+rsa_key_times = []
+elg_key_times = []
 
 bstart=time.perf_counter()
 
-secret_message = secrets.randbits(256)
+secret_message = long_to_bytes(secrets.randbits(256))
 
 for size in key_sizes:
     print(f"Testing key size: {size} bits")
 
+    start = time.perf_counter()
     elgamal_param = elgamal_generate_keys(size)
+    elg_key_times.append(time.perf_counter()-start)
+
+    start = time.perf_counter()
     rsa_param = my_rsa_generate_keys(size)
+    rsa_key_times.append(time.perf_counter()-start)
 
     r_enc, r_dec = my_rsa_test(secret_message, rsa_param[0], rsa_param[1])
     e_enc, e_dec = elgamal_test(secret_message, elgamal_param)
@@ -110,10 +114,12 @@ for size in key_sizes:
     elg_enc_times.append(round(e_enc, 8))
     elg_dec_times.append(round(e_dec, 8))
 
-print(rsa_enc_times)
-print(rsa_dec_times)
-print(elg_enc_times)
-print(elg_dec_times)
+print(f'rsa_enc_times = {rsa_enc_times}')
+print(f'rsa_dec_times = {rsa_dec_times}')
+print(f'elg_enc_times = {elg_enc_times}')
+print(f'elg_dec_times = {elg_dec_times}')
+print(f'rsa_key_times = {rsa_key_times}')
+print(f'elg_key_times = {elg_key_times}')
 
 btime=round(time.perf_counter()-bstart)
 
@@ -139,6 +145,17 @@ plt.plot(key_sizes, elg_dec_times, marker='o', label='ElGamal Decryption')
 plt.xlabel("Key size (bits)")
 plt.ylabel("Time (seconds)")
 plt.title("Decryption Time Comparison")
+plt.legend()
+plt.grid()
+plt.show()
+
+# Decryption graph
+plt.figure()
+plt.plot(key_sizes, rsa_key_times, marker='o', label='RSA Keys Generation')
+plt.plot(key_sizes, elg_key_times, marker='o', label='ElGamal Keys Generation')
+plt.xlabel("Key size (bits)")
+plt.ylabel("Time (seconds)")
+plt.title("Key Generation Time Comparison")
 plt.legend()
 plt.grid()
 plt.show()
