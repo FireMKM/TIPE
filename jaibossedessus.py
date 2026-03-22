@@ -5,7 +5,7 @@ import secrets
 
 from Crypto.Util.number import getPrime, inverse, bytes_to_long, long_to_bytes
 
-## Mon RSA
+## My RSA
 
 def my_rsa_generate_keys(key_size):
     p, q = getPrime(int(key_size/2)), getPrime(int(key_size/2))
