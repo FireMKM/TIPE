@@ -45,6 +45,7 @@ def my_rsa_test(secret_message, public_key, private_key):
 
 def elgamal_generate_keys(key_size):
     p = getPrime(key_size)
+    print(p)
     g = random.randint(2, p - 2)
     x = random.randint(1, p - 2)  # clé privée
     y = pow(g, x, p)              # clé publique
