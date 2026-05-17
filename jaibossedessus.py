@@ -5,6 +5,11 @@ import secrets
 
 from Crypto.Util.number import getPrime, inverse, bytes_to_long, long_to_bytes
 
+## Utils
+
+def moyenne(liste):
+    return sum(liste) / len(liste)
+
 ## My RSA
 
 def my_rsa_generate_keys(key_size):
@@ -99,21 +104,31 @@ secret_message = long_to_bytes(secrets.randbits(256))
 for size in key_sizes:
     print(f"Testing key size: {size} bits")
 
-    start = time.perf_counter()
-    elgamal_param = elgamal_generate_keys(size)
-    elg_key_times.append(time.perf_counter()-start)
+    L_r_enc, L_r_dec, L_e_enc, L_e_dec, L_r_kt, L_e_kt = [], [], [], [], [], []
 
-    start = time.perf_counter()
-    rsa_param = my_rsa_generate_keys(size)
-    rsa_key_times.append(time.perf_counter()-start)
+    for i in range(30):
+        start = time.perf_counter()
+        elgamal_param = elgamal_generate_keys(size)
+        L_e_kt.append(time.perf_counter()-start)
 
-    r_enc, r_dec = my_rsa_test(secret_message, rsa_param[0], rsa_param[1])
-    e_enc, e_dec = elgamal_test(secret_message, elgamal_param)
+        start = time.perf_counter()
+        rsa_param = my_rsa_generate_keys(size)
+        L_r_kt.append(time.perf_counter()-start)
 
-    rsa_enc_times.append(round(r_enc, 8))
-    rsa_dec_times.append(round(r_dec, 8))
-    elg_enc_times.append(round(e_enc, 8))
-    elg_dec_times.append(round(e_dec, 8))
+        r_enc, r_dec = my_rsa_test(secret_message, rsa_param[0], rsa_param[1])
+        e_enc, e_dec = elgamal_test(secret_message, elgamal_param)
+
+        L_r_enc.append(r_enc)
+        L_r_dec.append(r_dec)
+        L_e_enc.append(e_enc)
+        L_e_dec.append(e_dec)
+
+    elg_key_times.append(round(moyenne(L_e_kt), 8))
+    rsa_key_times.append(round(moyenne(L_r_kt), 8))
+    rsa_enc_times.append(round(moyenne(L_r_enc), 8))
+    rsa_dec_times.append(round(moyenne(L_r_dec), 8))
+    elg_enc_times.append(round(moyenne(L_e_enc), 8))
+    elg_dec_times.append(round(moyenne(L_e_dec), 8))
 
 print(f'rsa_enc_times = {rsa_enc_times}')
 print(f'rsa_dec_times = {rsa_dec_times}')

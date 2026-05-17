@@ -29,22 +29,40 @@ data, sw1, sw2 = connection.transmit(elgamal_decrypt)
 print([hex(i) for i in data])
 print(hex(sw1), hex(sw2))
 
-# connection.transmit(applet_selection)
-# print('-------- RSA ENCRYPTION --------')
-# start = time.perf_counter()
-# data, sw1, sw2 = connection.transmit(encrypt_apdu)
-# rsa_enc_time = time.perf_counter() - start
-#
-# print(f'Encrypted data: {data}')
-# print(f'({hex(sw1)} {hex(sw2)})')
-# print(f'rsa_enc_time: {rsa_enc_time}')
-#
-# print('-------- RSA DECRYPTION --------')
-# decrypt_apdu = [0x22, 0x10, 0x02, 0x00, 0x80] + data + [0x80]
-# start = time.perf_counter()
-# message, sw1, sw2 = connection.transmit(decrypt_apdu)
-# rsa_dec_time = time.perf_counter() - start
-#
-# print(f'Decrypted message: {message}')
-# print(f'({hex(sw1)} {hex(sw2)})')
-# print(f'rsa_dec_time: {rsa_dec_time}')
+connection.transmit(applet_selection)
+print('-------- RSA ENCRYPTION --------')
+start = time.perf_counter()
+data, sw1, sw2 = connection.transmit(rsa_encrypt_apdu)
+rsa_enc_time = time.perf_counter() - start
+
+print(f'Encrypted data: {data}')
+print(f'({hex(sw1)} {hex(sw2)})')
+print(f'rsa_enc_time: {rsa_enc_time}')
+
+print('-------- RSA DECRYPTION --------')
+decrypt_apdu = [0x22, 0x10, 0x02, 0x00, 0x80] + data + [0x80]
+start = time.perf_counter()
+message, sw1, sw2 = connection.transmit(decrypt_apdu)
+rsa_dec_time = time.perf_counter() - start
+
+print(f'Decrypted message: {message}')
+print(f'({hex(sw1)} {hex(sw2)})')
+print(f'rsa_dec_time: {rsa_dec_time}')
+
+print('-------- ELGAMAL ENCRYPTION --------')
+start = time.perf_counter()
+data, sw1, sw2 = connection.transmit(elgamal_encrypt_apdu)
+rsa_enc_time = time.perf_counter() - start
+
+print(f'Encrypted data: {data}')
+print(f'({hex(sw1)} {hex(sw2)})')
+print(f'elgamal_enc_time: {rsa_enc_time}')
+
+print('-------- ELGAMAL DECRYPTION --------')
+start = time.perf_counter()
+message, sw1, sw2 = connection.transmit(elgamal_decrypt)
+rsa_dec_time = time.perf_counter() - start
+
+print(f'Decrypted message: {message}')
+print(f'({hex(sw1)} {hex(sw2)})')
+print(f'elgamal_dec_time: {rsa_dec_time}')
